@@ -295,7 +295,58 @@ export default function RekapTable({
 
         </tbody>
       </table>
+      
+      <div className="mt-4 bg-gray-100 border rounded p-4 text-red-700">
 
+        <h2 className="font-bold text-lg mb-3 ">
+          Catatan Keterangan
+        </h2>
+
+        {data.filter(
+          (item) => item.keterangan
+        ).length === 0 && (
+          <p className="text-gray-500">
+            Tidak ada catatan
+          </p>
+        )}
+
+        {data.map((item, index) => (
+
+          item.keterangan ? (
+
+            <div
+              key={item.id}
+              className="mb-2 border-b pb-2"
+            >
+
+              <p className="font-semibold">
+                {index + 1}.{" "}
+                {item.tanggal}
+              </p>
+
+              <div className="text-sm text-gray-700">
+                
+              {item.keterangan
+                .split("\n")
+                .map((line, i) => (
+
+                  <div
+                    key={i}
+                    className="mb-1"
+                  >
+                    {line}
+                  </div>
+
+                ))}
+            </div>
+
+            </div>
+
+          ) : null
+
+        ))}
+
+      </div>
     </div>
   );
 }
