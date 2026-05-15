@@ -1,14 +1,14 @@
 interface Props {
   totalBelanja: number;
   subtotalCashbon: number;
-  totalRekening: number;
+  subtotalLainnya: number;
   grandTotal: number;
 }
 
 export default function SummaryCard({
   totalBelanja,
   subtotalCashbon,
-  totalRekening,
+  subtotalLainnya,
   grandTotal,
 }: Props) {
   return (
@@ -42,12 +42,12 @@ export default function SummaryCard({
 
       <div className="bg-green-500 text-black p-5 rounded-xl shadow-lg">
         <h2 className="text-lg font-semibold">
-          Dalam Rekening
+          Subtotal Lainnya
         </h2>
 
         <p className="text-2xl font-bold">
           Rp
-          {totalRekening.toLocaleString(
+          {subtotalLainnya.toLocaleString(
             "id-ID"
           )}
         </p>
