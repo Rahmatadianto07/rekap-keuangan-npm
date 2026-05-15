@@ -16,15 +16,17 @@ export default function FormTransaksi({
   onUpdate,
   saldoTerakhir,
 }: Props) {
+
   const [form, setForm] = useState({
-    tanggal: "",
-    danaTambahan: "",
-    belanja: "",
-    cashbon: "",
-    lainnya: "",
-    markup: "",
-    cash: "",
-  });
+  tanggal: "",
+  danaTambahan: "",
+  belanja: "",
+  cashbon: "",
+  lainnya: "",
+  markup: "",
+  cash: "",
+  keterangan: "",
+});
 
   useEffect(() => {
     if (editingData) {
@@ -33,122 +35,181 @@ export default function FormTransaksi({
 
         danaTambahan: "",
 
-        belanja: new Intl.NumberFormat("id-ID").format(
-          editingData.belanja
+        belanja: new Intl.NumberFormat(
+          "id-ID"
+        ).format(
+          editingData.belanja || 0
         ),
 
-        cashbon: new Intl.NumberFormat("id-ID").format(
-          editingData.cashbon
+        cashbon: new Intl.NumberFormat(
+          "id-ID"
+        ).format(
+          editingData.cashbon || 0
         ),
 
-        lainnya: new Intl.NumberFormat("id-ID").format(
-          editingData.lainnya
+        lainnya: new Intl.NumberFormat(
+          "id-ID"
+        ).format(
+          editingData.lainnya || 0
         ),
 
-        markup: new Intl.NumberFormat("id-ID").format(
-          editingData.markup
+        markup: new Intl.NumberFormat(
+          "id-ID"
+        ).format(
+          editingData.markup || 0
         ),
 
-        cash: new Intl.NumberFormat("id-ID").format(
-          editingData.cash
+        cash: new Intl.NumberFormat(
+          "id-ID"
+        ).format(
+          editingData.cash || 0
         ),
+
+        keterangan:
+          editingData.keterangan || "",
       });
     }
   }, [editingData]);
 
-  const formatNumber = (value: string) => {
-    const number = value.replace(/\D/g, "");
+  const formatNumber = (
+    value: string
+  ) => {
+    const number = value.replace(
+      /\D/g,
+      ""
+    );
 
     if (!number) return "";
 
-    return new Intl.NumberFormat("id-ID").format(
-      Number(number)
+    return new Intl.NumberFormat(
+      "id-ID"
+    ).format(Number(number));
+  };
+
+  const parseNumber = (
+    value: string
+  ) => {
+    return Number(
+      value.replace(/\./g, "")
     );
   };
 
-  const parseNumber = (value: string) => {
-    return Number(value.replace(/\./g, ""));
-  };
-
-  const danaTambahanPreview = parseNumber(
-    form.danaTambahan || "0"
-  );
+  const danaTambahanPreview =
+    parseNumber(
+      form.danaTambahan || "0"
+    );
 
   const saldoAwalPreview =
-    saldoTerakhir + danaTambahanPreview;
+    saldoTerakhir +
+    danaTambahanPreview;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    const handleSubmit = (
+      e: React.FormEvent
+    ) => {
+      e.preventDefault();
 
-    const danaTambahan = parseNumber(
-      form.danaTambahan
-    );
+      if (!form.tanggal) {
+        alert(
+          "Tanggal wajib diisi"
+        );
 
-    const saldoAwal = editingData
-      ? editingData.saldoAwal + danaTambahan
-      : saldoTerakhir + danaTambahan;
+        return;
+      }
 
-    const belanja = parseNumber(form.belanja);
+      if (
+        !form.belanja ||
+        parseNumber(form.belanja) <= 0
+      ) {
+        alert(
+          "Belanja wajib diisi"
+        );
 
-    const cashbon = parseNumber(form.cashbon);
+        return;
+      }
 
-    const lainnya = parseNumber(form.lainnya);
+      const danaTambahan =
+        parseNumber(
+          form.danaTambahan
+        );
 
-    const markup = parseNumber(form.markup);
+      const saldoAwal =
+        editingData
+          ? editingData.saldoAwal +
+            danaTambahan
+          : saldoTerakhir +
+            danaTambahan;
 
-    const cash = parseNumber(form.cash);
+      const belanja =
+        parseNumber(form.belanja);
 
-    const saldoAkhir =
-      saldoAwal -
-      belanja -
-      cashbon -
-      lainnya -
-      markup;
+      const cashbon =
+        parseNumber(form.cashbon);
 
-    const newData: Transaksi = {
-      id: editingData
-        ? editingData.id
-        : Date.now(),
+      const lainnya =
+        parseNumber(form.lainnya);
 
-      tanggal: form.tanggal,
+      const markup =
+        parseNumber(form.markup);
 
-      saldoAwal,
+      const cash =
+        parseNumber(form.cash);
 
-      belanja,
+      const saldoAkhir =
+        saldoAwal -
+        belanja -
+        cashbon -
+        lainnya -
+        markup;
 
-      cashbon,
+      const newData: Transaksi = {
+        id: editingData
+          ? editingData.id
+          : Date.now(),
 
-      lainnya,
+        tanggal: form.tanggal,
 
-      markup,
+        saldoAwal,
 
-      saldoAkhir,
+        belanja,
 
-      cash,
+        cashbon,
+
+        lainnya,
+
+        markup,
+
+        saldoAkhir,
+
+        cash,
+
+        keterangan:
+          form.keterangan,
+      };
+
+      if (editingData) {
+        onUpdate(newData);
+      } else {
+        onAdd(newData);
+      }
+
+      setForm({
+        tanggal: "",
+        danaTambahan: "",
+        belanja: "",
+        cashbon: "",
+        lainnya: "",
+        markup: "",
+        cash: "",
+        keterangan: "",
+      });
     };
-
-    if (editingData) {
-      onUpdate(newData);
-    } else {
-      onAdd(newData);
-    }
-
-    setForm({
-      tanggal: "",
-      danaTambahan: "",
-      belanja: "",
-      cashbon: "",
-      lainnya: "",
-      markup: "",
-      cash: "",
-    });
-  };
 
   return (
     <form
       onSubmit={handleSubmit}
       className="grid md:grid-cols-3 gap-3 mb-6 text-black"
     >
+
       <div className="border p-2 rounded bg-gray-200">
         <p className="text-sm text-gray-700">
           Saldo Awal Otomatis
@@ -169,7 +230,8 @@ export default function FormTransaksi({
         onChange={(e) =>
           setForm({
             ...form,
-            tanggal: e.target.value,
+            tanggal:
+              e.target.value,
           })
         }
       />
@@ -182,9 +244,10 @@ export default function FormTransaksi({
         onChange={(e) =>
           setForm({
             ...form,
-            danaTambahan: formatNumber(
-              e.target.value
-            ),
+            danaTambahan:
+              formatNumber(
+                e.target.value
+              ),
           })
         }
       />
@@ -197,9 +260,10 @@ export default function FormTransaksi({
         onChange={(e) =>
           setForm({
             ...form,
-            belanja: formatNumber(
-              e.target.value
-            ),
+            belanja:
+              formatNumber(
+                e.target.value
+              ),
           })
         }
       />
@@ -212,9 +276,10 @@ export default function FormTransaksi({
         onChange={(e) =>
           setForm({
             ...form,
-            cashbon: formatNumber(
-              e.target.value
-            ),
+            cashbon:
+              formatNumber(
+                e.target.value
+              ),
           })
         }
       />
@@ -227,9 +292,10 @@ export default function FormTransaksi({
         onChange={(e) =>
           setForm({
             ...form,
-            lainnya: formatNumber(
-              e.target.value
-            ),
+            lainnya:
+              formatNumber(
+                e.target.value
+              ),
           })
         }
       />
@@ -242,9 +308,10 @@ export default function FormTransaksi({
         onChange={(e) =>
           setForm({
             ...form,
-            markup: formatNumber(
-              e.target.value
-            ),
+            markup:
+              formatNumber(
+                e.target.value
+              ),
           })
         }
       />
@@ -257,11 +324,38 @@ export default function FormTransaksi({
         onChange={(e) =>
           setForm({
             ...form,
-            cash: formatNumber(
-              e.target.value
-            ),
+            cash:
+              formatNumber(
+                e.target.value
+              ),
           })
         }
+      />
+
+      <textarea
+        placeholder="Keterangan / Catatan"
+        className="border p-2 rounded md:col-span-2 min-h-30"
+        value={form.keterangan}
+        onChange={(e) => {
+          const lines = e.target.value
+            .split("\n")
+            .map((line, index) => {
+              const clean = line.replace(
+                /^\d+\.\s*/,
+                ""
+              );
+
+              return clean
+                ? `${index + 1}. ${clean}`
+                : "";
+            });
+
+          setForm({
+            ...form,
+            keterangan:
+              lines.join("\n"),
+          });
+        }}
       />
 
       <button className="bg-blue-300 text-black rounded p-2 hover:bg-blue-700">
@@ -269,6 +363,7 @@ export default function FormTransaksi({
           ? "Update Data"
           : "Tambah Data"}
       </button>
+
     </form>
   );
 }
