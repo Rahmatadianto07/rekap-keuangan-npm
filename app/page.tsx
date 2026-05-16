@@ -282,8 +282,8 @@ const [selectedCatatanId, setSelectedCatatanId] =
     68
   );
 
-  doc.text(
-    "Dalam Rekening",
+doc.text(
+    "Subtotal Lainnya",
     14,
     74
   );
@@ -295,7 +295,14 @@ const [selectedCatatanId, setSelectedCatatanId] =
   );
 
   doc.text(
-    `Rp${totalRekening.toLocaleString("id-ID")}`,
+    `Rp${data
+      .reduce(
+        (a, b) =>
+          a +
+          (b.lainnya || 0),
+        0
+      )
+      .toLocaleString("id-ID")}`,
     60,
     74
   );
