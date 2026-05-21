@@ -1122,7 +1122,7 @@ const resetSemuaData = () => {
       />
 
         <div className="bg-amber-100 p-5 rounded-xl shadow-lg">
-          <div className="grid grid-cols-2 md:grid-cols-7 gap-3 mb-4">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-4">
 
             <label className="bg-gray-700 text-white px-4 py-2 rounded-lg cursor-pointer">
               Upload Logo
@@ -1180,7 +1180,7 @@ const resetSemuaData = () => {
               Export Excel
             </button>
 
-           <button
+           {/* <button
             onClick={() => {
 
               if (data.length === 0) {
@@ -1207,7 +1207,7 @@ const resetSemuaData = () => {
             className="bg-yellow-500 text-black px-4 py-2 rounded-lg font-semibold hover:bg-yellow-600"
           >
             Edit Catatan
-          </button>
+          </button> */}
 
           
           </div>
@@ -1274,12 +1274,25 @@ const resetSemuaData = () => {
             }
           />
 
+          
           <RekapTable
             data={data}
             onDelete={deleteData}
             onEdit={setEditingData}
             onPrint={printHarian}
+            onEditCatatan={(item) => {
+
+              setSelectedCatatanId(
+                item.id
+              );
+
+              setCatatanEdit(
+                item.keterangan || ""
+              );
+
+            }}
           />
+
         </div>
       </div>
     </main>
