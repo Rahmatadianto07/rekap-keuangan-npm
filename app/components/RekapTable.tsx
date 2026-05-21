@@ -10,9 +10,12 @@ import { Transaksi } from "@/types/transaksi";
 import { rupiah } from "@/utils/rupiah";
 
 interface Props {
+
   data: Transaksi[];
 
-  onDelete: (id: number) => void;
+  onDelete: (
+    id: number
+  ) => void;
 
   onEdit: (
     item: Transaksi
@@ -21,13 +24,21 @@ interface Props {
   onPrint: (
     item: Transaksi
   ) => void;
+
+  onEditCatatan: (
+    item: Transaksi
+  ) => void;
+
 }
 
 export default function RekapTable({
+
   data,
   onDelete,
   onEdit,
   onPrint,
+  onEditCatatan,
+
 }: Props) {
 
   const subtotalBelanja =
@@ -61,7 +72,8 @@ export default function RekapTable({
   const subtotalSaldoAkhir =
     data.reduce(
       (a, b) =>
-        a + (b.saldoAkhir || 0),
+        a +
+        (b.saldoAkhir || 0),
       0
     );
 
@@ -75,16 +87,17 @@ export default function RekapTable({
   const grandTotal =
     subtotalBelanja +
     subtotalCashbon +
-    subtotalLainnya +
-    subtotalMarkup;
+    subtotalLainnya;
 
   return (
+
     <div className="overflow-x-auto">
 
       <table className="w-full border text-sm text-black">
 
         <thead>
-          <tr className="bg-green-600">
+
+          <tr className="bg-green-600 text-white">
 
             <th className="border p-2">
               NO
@@ -127,62 +140,85 @@ export default function RekapTable({
             </th>
 
           </tr>
+
         </thead>
 
         <tbody>
 
           {data.map(
-            (item, index) => (
+            (
+              item,
+              index
+            ) => (
+
               <tr key={item.id}>
 
                 <td className="border p-2 text-center">
+
                   {index + 1}
+
                 </td>
 
                 <td className="border p-2">
+
                   {item.tanggal}
+
                 </td>
 
                 <td className="border p-2">
+
                   {rupiah(
                     item.saldoAwal || 0
                   )}
+
                 </td>
 
                 <td className="border p-2 text-red-600">
+
                   {rupiah(
                     item.belanja || 0
                   )}
+
                 </td>
 
                 <td className="border p-2">
+
                   {rupiah(
                     item.cashbon || 0
                   )}
+
                 </td>
 
                 <td className="border p-2">
+
                   {rupiah(
                     item.lainnya || 0
                   )}
+
                 </td>
 
                 <td className="border p-2">
+
                   {rupiah(
                     item.markup || 0
                   )}
+
                 </td>
 
                 <td className="border p-2 font-bold">
+
                   {rupiah(
                     item.saldoAkhir || 0
                   )}
+
                 </td>
 
                 <td className="border p-2">
+
                   {rupiah(
                     item.cash || 0
                   )}
+
                 </td>
 
                 <td className="border p-2">
@@ -194,6 +230,7 @@ export default function RekapTable({
                         onPrint(item)
                       }
                       className="text-green-700"
+                      title="Print"
                     >
                       <FaPrint />
                     </button>
@@ -203,8 +240,21 @@ export default function RekapTable({
                         onEdit(item)
                       }
                       className="text-blue-600"
+                      title="Edit Data"
                     >
                       <FaEdit />
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        onEditCatatan(
+                          item
+                        )
+                      }
+                      className="text-yellow-600 font-bold"
+                      title="Edit Catatan"
+                    >
+                      C
                     </button>
 
                     <button
@@ -214,6 +264,7 @@ export default function RekapTable({
                         )
                       }
                       className="text-red-600"
+                      title="Hapus"
                     >
                       <FaTrash />
                     </button>
@@ -223,10 +274,11 @@ export default function RekapTable({
                 </td>
 
               </tr>
+
             )
           )}
 
-          <tr className="bg-blue-500 font-bold">
+          <tr className="bg-blue-500 font-bold text-white">
 
             <td
               colSpan={3}
@@ -236,37 +288,49 @@ export default function RekapTable({
             </td>
 
             <td className="border p-2">
+
               {rupiah(
                 subtotalBelanja
               )}
+
             </td>
 
             <td className="border p-2">
+
               {rupiah(
                 subtotalCashbon
               )}
+
             </td>
 
             <td className="border p-2">
+
               {rupiah(
                 subtotalLainnya
               )}
+
             </td>
 
             <td className="border p-2">
+
               {rupiah(
                 subtotalMarkup
               )}
+
             </td>
 
             <td className="border p-2">
+
               {rupiah(
                 subtotalSaldoAkhir
               )}
+
             </td>
 
             <td className="border p-2">
+
               {rupiah(totalCash)}
+
             </td>
 
             <td className="border p-2"></td>
@@ -286,67 +350,111 @@ export default function RekapTable({
               colSpan={3}
               className="border p-2 text-center text-red-700"
             >
+
               {rupiah(
                 grandTotal
               )}
+
             </td>
 
           </tr>
 
         </tbody>
+
       </table>
-      
+
       <div className="mt-4 bg-gray-100 border rounded p-4 text-red-700">
 
-        <h2 className="font-bold text-lg mb-3 ">
+        <h2 className="font-bold text-lg mb-3">
+
           Catatan Keterangan
+
         </h2>
 
         {data.filter(
-          (item) => item.keterangan
+          (item) =>
+            item.keterangan
         ).length === 0 && (
+
           <p className="text-gray-500">
+
             Tidak ada catatan
+
           </p>
+
         )}
 
-        {data.map((item, index) => (
+        {data.map(
+          (
+            item,
+            index
+          ) => (
 
-          item.keterangan ? (
+            item.keterangan ? (
 
-            <div
-              key={item.id}
-              className="mb-2 border-b pb-2"
-            >
+              <div
+                key={item.id}
+                className="mb-4 border-b pb-3"
+              >
 
-              <p className="font-semibold">
-                {index + 1}.{" "}
-                {item.tanggal}
-              </p>
+                <div className="flex items-center justify-between">
 
-              <div className="text-sm text-gray-700">
-                
-              {item.keterangan
-                .split("\n")
-                .map((line, i) => (
+                  <p className="font-semibold">
 
-                  <div
-                    key={i}
-                    className="mb-1"
+                    {index + 1}.{" "}
+                    {item.tanggal}
+
+                  </p>
+
+                  <button
+                    onClick={() =>
+                      onEditCatatan(
+                        item
+                      )
+                    }
+                    className="text-blue-600 text-sm font-semibold"
                   >
-                    {line}
-                  </div>
+                    Edit
+                  </button>
 
-                ))}
-            </div>
+                </div>
 
-            </div>
+                <div className="text-sm text-gray-700 mt-2">
 
-          ) : null
+                  {item.keterangan
+                    .split("\n")
+                    .map(
+                      (
+                        line,
+                        i
+                      ) => (
 
-        ))}
+                        <div
+                          key={i}
+                          className="mb-1"
+                        >
+
+                          {line}
+
+                        </div>
+
+                      )
+                    )}
+
+                </div>
+
+              </div>
+
+            ) : null
+
+          )
+        )}
 
       </div>
+
     </div>
+
   );
+
 }
+
