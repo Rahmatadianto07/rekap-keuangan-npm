@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -8,6 +9,7 @@ interface Props {
   editingData: Transaksi | null;
   onUpdate: (data: Transaksi) => void;
   saldoTerakhir: number;
+  allData: Transaksi[];
 }
 
 export default function FormTransaksi({
@@ -15,83 +17,133 @@ export default function FormTransaksi({
   editingData,
   onUpdate,
   saldoTerakhir,
+  allData,
 }: Props) {
 
   const [form, setForm] = useState({
-  tanggal: "",
-  danaTambahan: "",
-  belanja: "",
-  cashbon: "",
-  lainnya: "",
-  markup: "",
-  cash: "",
-  keterangan: "",
-});
+    tanggal: "",
+    danaTambahan: "",
+    belanja: "",
+    cashbon: "",
+    lainnya: "",
+    markup: "",
+    cash: "",
+    keterangan: "",
+  });
+
+  const [saldoAwalEdit, setSaldoAwalEdit] =
+    useState(0);
 
   useEffect(() => {
+
     if (editingData) {
+
+      const sortedData =
+        [...allData].sort(
+          (a, b) =>
+            new Date(a.tanggal).getTime() -
+            new Date(b.tanggal).getTime()
+        );
+
+      const currentIndex =
+        sortedData.findIndex(
+          (item) =>
+            item.id === editingData.id
+        );
+
+      let saldoAwalBaru =
+        editingData.saldoAwal;
+
+      if (currentIndex > 0) {
+
+        saldoAwalBaru =
+          sortedData[
+            currentIndex - 1
+          ].saldoAkhir || 0;
+
+      }
+
+      setSaldoAwalEdit(
+        saldoAwalBaru
+      );
+
       setForm({
-        tanggal: editingData.tanggal,
+        tanggal:
+          editingData.tanggal,
 
         danaTambahan: "",
 
-        belanja: new Intl.NumberFormat(
-          "id-ID"
-        ).format(
-          editingData.belanja || 0
-        ),
+        belanja:
+          new Intl.NumberFormat(
+            "id-ID"
+          ).format(
+            editingData.belanja || 0
+          ),
 
-        cashbon: new Intl.NumberFormat(
-          "id-ID"
-        ).format(
-          editingData.cashbon || 0
-        ),
+        cashbon:
+          new Intl.NumberFormat(
+            "id-ID"
+          ).format(
+            editingData.cashbon || 0
+          ),
 
-        lainnya: new Intl.NumberFormat(
-          "id-ID"
-        ).format(
-          editingData.lainnya || 0
-        ),
+        lainnya:
+          new Intl.NumberFormat(
+            "id-ID"
+          ).format(
+            editingData.lainnya || 0
+          ),
 
-        markup: new Intl.NumberFormat(
-          "id-ID"
-        ).format(
-          editingData.markup || 0
-        ),
+        markup:
+          new Intl.NumberFormat(
+            "id-ID"
+          ).format(
+            editingData.markup || 0
+          ),
 
-        cash: new Intl.NumberFormat(
-          "id-ID"
-        ).format(
-          editingData.cash || 0
-        ),
+        cash:
+          new Intl.NumberFormat(
+            "id-ID"
+          ).format(
+            editingData.cash || 0
+          ),
 
         keterangan:
           editingData.keterangan || "",
       });
+
     }
-  }, [editingData]);
+
+  }, [editingData, allData]);
 
   const formatNumber = (
     value: string
   ) => {
-    const number = value.replace(
-      /\D/g,
-      ""
-    );
+
+    const number =
+      value.replace(
+        /\D/g,
+        ""
+      );
 
     if (!number) return "";
 
     return new Intl.NumberFormat(
       "id-ID"
-    ).format(Number(number));
+    ).format(
+      Number(number)
+    );
+
   };
 
   const parseNumber = (
     value: string
   ) => {
+
     return Number(
       value.replace(/\./g, "")
     );
+
   };
 
   const danaTambahanPreview =
@@ -100,127 +152,161 @@ export default function FormTransaksi({
     );
 
   const saldoAwalPreview =
-    saldoTerakhir +
-    danaTambahanPreview;
+    editingData
+      ? saldoAwalEdit +
+        danaTambahanPreview
+      : saldoTerakhir +
+        danaTambahanPreview;
 
-    const handleSubmit = (
-      e: React.FormEvent
-    ) => {
-      e.preventDefault();
+  const handleSubmit = (
+    e: React.FormEvent
+  ) => {
 
-      if (!form.tanggal) {
-        alert(
-          "Tanggal wajib diisi"
-        );
+    e.preventDefault();
 
-        return;
-      }
+    if (!form.tanggal) {
 
-      if (
-        !form.belanja ||
-        parseNumber(form.belanja) <= 0
-      ) {
-        alert(
-          "Belanja wajib diisi"
-        );
+      alert(
+        "Tanggal wajib diisi"
+      );
 
-        return;
-      }
+      return;
 
-      const danaTambahan =
-        parseNumber(
-          form.danaTambahan
-        );
+    }
 
-      const saldoAwal =
+    if (
+      !form.belanja ||
+      parseNumber(
+        form.belanja
+      ) <= 0
+    ) {
+
+      alert(
+        "Belanja wajib diisi"
+      );
+
+      return;
+
+    }
+
+    const danaTambahan =
+      parseNumber(
+        form.danaTambahan
+      );
+
+    const saldoAwal =
+      editingData
+        ? saldoAwalEdit +
+          danaTambahan
+        : saldoTerakhir +
+          danaTambahan;
+
+    const belanja =
+      parseNumber(
+        form.belanja
+      );
+
+    const cashbon =
+      parseNumber(
+        form.cashbon
+      );
+
+    const lainnya =
+      parseNumber(
+        form.lainnya
+      );
+
+    const markup =
+      parseNumber(
+        form.markup
+      );
+
+    const cash =
+      parseNumber(
+        form.cash
+      );
+
+    const saldoAkhir =
+      saldoAwal -
+      belanja -
+      cashbon -
+      lainnya -
+      markup;
+
+    const newData: Transaksi = {
+
+      id:
         editingData
-          ? editingData.saldoAwal +
-            danaTambahan
-          : saldoTerakhir +
-            danaTambahan;
-
-      const belanja =
-        parseNumber(form.belanja);
-
-      const cashbon =
-        parseNumber(form.cashbon);
-
-      const lainnya =
-        parseNumber(form.lainnya);
-
-      const markup =
-        parseNumber(form.markup);
-
-      const cash =
-        parseNumber(form.cash);
-
-      const saldoAkhir =
-        saldoAwal -
-        belanja -
-        cashbon -
-        lainnya -
-        markup;
-
-      const newData: Transaksi = {
-        id: editingData
           ? editingData.id
           : Date.now(),
 
-        tanggal: form.tanggal,
+      tanggal:
+        form.tanggal,
 
-        saldoAwal,
+      saldoAwal,
 
-        belanja,
+      belanja,
 
-        cashbon,
+      cashbon,
 
-        lainnya,
+      lainnya,
 
-        markup,
+      markup,
 
-        saldoAkhir,
+      saldoAkhir,
 
-        cash,
+      cash,
 
-        keterangan:
-          form.keterangan,
-      };
+      keterangan:
+        form.keterangan,
 
-      if (editingData) {
-        onUpdate(newData);
-      } else {
-        onAdd(newData);
-      }
-
-      setForm({
-        tanggal: "",
-        danaTambahan: "",
-        belanja: "",
-        cashbon: "",
-        lainnya: "",
-        markup: "",
-        cash: "",
-        keterangan: "",
-      });
     };
 
+    if (editingData) {
+
+      onUpdate(newData);
+
+    } else {
+
+      onAdd(newData);
+
+    }
+
+    setForm({
+      tanggal: "",
+      danaTambahan: "",
+      belanja: "",
+      cashbon: "",
+      lainnya: "",
+      markup: "",
+      cash: "",
+      keterangan: "",
+    });
+
+  };
+
   return (
+
     <form
       onSubmit={handleSubmit}
       className="grid md:grid-cols-3 gap-3 mb-6 text-black"
     >
 
       <div className="border p-2 rounded bg-gray-200">
+
         <p className="text-sm text-gray-700">
           Saldo Awal Otomatis
         </p>
 
         <p className="font-bold text-lg">
+
           Rp
           {saldoAwalPreview.toLocaleString(
             "id-ID"
           )}
+
         </p>
+
       </div>
 
       <input
@@ -337,33 +423,49 @@ export default function FormTransaksi({
         className="border p-2 rounded md:col-span-2 min-h-30"
         value={form.keterangan}
         onChange={(e) => {
-          const lines = e.target.value
-            .split("\n")
-            .map((line, index) => {
-              const clean = line.replace(
-                /^\d+\.\s*/,
-                ""
-              );
 
-              return clean
-                ? `${index + 1}. ${clean}`
-                : "";
-            });
+          const lines =
+            e.target.value
+              .split("\n")
+              .map(
+                (
+                  line,
+                  index
+                ) => {
+
+                  const clean =
+                    line.replace(
+                      /^\d+\.\s*/,
+                      ""
+                    );
+
+                  return clean
+                    ? `${index + 1}. ${clean}`
+                    : "";
+
+                }
+              );
 
           setForm({
             ...form,
             keterangan:
               lines.join("\n"),
           });
+
         }}
       />
 
       <button className="bg-blue-300 text-black rounded p-2 hover:bg-blue-700">
+
         {editingData
           ? "Update Data"
           : "Tambah Data"}
+
       </button>
 
     </form>
+
   );
+
 }
+
