@@ -406,7 +406,7 @@ export default function RekapTable({
 
                   </p>
 
-                  <button
+                   {/* <button
                     onClick={() =>
                       onEditCatatan(
                         item
@@ -415,7 +415,7 @@ export default function RekapTable({
                     className="text-blue-600 text-sm font-semibold"
                   >
                     Edit
-                  </button>
+                  </button> */}
 
                 </div>
 
