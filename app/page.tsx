@@ -544,13 +544,399 @@ export default function Home() {
 
   };
 
-  const printBulanan = () => {
+const printBulanan = () => {
 
-    alert(
-      "Print bulanan tetap aktif"
+  const bulanIni =
+    new Date().getMonth();
+
+  const tahunIni =
+    new Date().getFullYear();
+
+  const filtered =
+    data.filter(
+      (item) => {
+
+        const tgl =
+          new Date(
+            item.tanggal
+          );
+
+        return (
+          tgl.getMonth() ===
+            bulanIni &&
+          tgl.getFullYear() ===
+            tahunIni
+        );
+
+      }
     );
 
-  };
+  if (
+    filtered.length === 0
+  ) {
+
+    alert(
+      "Tidak ada data bulan ini"
+    );
+
+    return;
+
+  }
+
+  const doc =
+    new jsPDF();
+
+  addKopSurat(doc);
+
+  doc.setFontSize(14);
+
+  doc.text(
+    "LAPORAN BELANJA BULANAN",
+    105,
+    55,
+    {
+      align: "center",
+    }
+  );
+
+  doc.setFontSize(11);
+
+  const subtotalBelanja =
+    filtered.reduce(
+      (a, b) =>
+        a +
+        (b.belanja || 0),
+      0
+    );
+
+  const subtotalCashbon =
+    filtered.reduce(
+      (a, b) =>
+        a +
+        (b.cashbon || 0),
+      0
+    );
+
+  const subtotalLainnya =
+    filtered.reduce(
+      (a, b) =>
+        a +
+        (b.lainnya || 0),
+      0
+    );
+
+  const subtotalMarkup =
+    filtered.reduce(
+      (a, b) =>
+        a +
+        (b.markup || 0),
+      0
+    );
+
+  const grandTotal =
+    subtotalBelanja +
+    subtotalCashbon +
+    subtotalLainnya +
+    subtotalMarkup;
+
+  doc.text(
+    "Total Belanja",
+    14,
+    62
+  );
+
+  doc.text(
+    ":",
+    55,
+    62
+  );
+
+  doc.text(
+    `Rp${subtotalBelanja.toLocaleString("id-ID")}`,
+    60,
+    62
+  );
+
+  doc.text(
+    "Subtotal Cashbon",
+    14,
+    68
+  );
+
+  doc.text(
+    ":",
+    55,
+    68
+  );
+
+  doc.text(
+    `Rp${subtotalCashbon.toLocaleString("id-ID")}`,
+    60,
+    68
+  );
+
+  doc.text(
+    "Subtotal Lainnya",
+    14,
+    74
+  );
+
+  doc.text(
+    ":",
+    55,
+    74
+  );
+
+  doc.text(
+    `Rp${subtotalLainnya.toLocaleString("id-ID")}`,
+    60,
+    74
+  );
+
+  doc.text(
+    "Subtotal Markup",
+    14,
+    80
+  );
+
+  doc.text(
+    ":",
+    55,
+    80
+  );
+
+  doc.text(
+    `Rp${subtotalMarkup.toLocaleString("id-ID")}`,
+    60,
+    80
+  );
+
+  doc.text(
+    "Grand Total",
+    14,
+    86
+  );
+
+  doc.text(
+    ":",
+    55,
+    86
+  );
+
+  doc.text(
+    `Rp${grandTotal.toLocaleString("id-ID")}`,
+    60,
+    86
+  );
+
+  autoTable(doc, {
+
+    startY: 94,
+
+    head: [[
+      "Tanggal",
+      "Saldo Awal",
+      "Belanja",
+      "Cashbon",
+      "Lainnya",
+      "Markup",
+      "Saldo Akhir",
+      "Dalam Rekening",
+      "Total",
+    ]],
+
+    body: filtered.map(
+      (item) => [
+
+        item.tanggal,
+
+        (
+          item.saldoAwal || 0
+        ).toLocaleString(
+          "id-ID"
+        ),
+
+        (
+          item.belanja || 0
+        ).toLocaleString(
+          "id-ID"
+        ),
+
+        (
+          item.cashbon || 0
+        ).toLocaleString(
+          "id-ID"
+        ),
+
+        (
+          item.lainnya || 0
+        ).toLocaleString(
+          "id-ID"
+        ),
+
+        (
+          item.markup || 0
+        ).toLocaleString(
+          "id-ID"
+        ),
+
+        (
+          item.saldoAkhir || 0
+        ).toLocaleString(
+          "id-ID"
+        ),
+
+        (
+          item.cash || 0
+        ).toLocaleString(
+          "id-ID"
+        ),
+
+        (
+          (item.belanja || 0) +
+          (item.cashbon || 0) +
+          (item.lainnya || 0) +
+          (item.markup || 0)
+        ).toLocaleString(
+          "id-ID"
+        ),
+
+      ]
+    ),
+
+  });
+
+  let finalY =
+    (doc as any)
+      .lastAutoTable
+      .finalY || 120;
+
+  finalY += 10;
+
+  doc.setFontSize(12);
+
+  doc.text(
+    "CATATAN BULANAN",
+    14,
+    finalY
+  );
+
+  let yPos =
+    finalY + 8;
+
+  filtered.forEach(
+    (
+      item,
+      dataIndex
+    ) => {
+
+      if (
+        !item.keterangan
+      ) return;
+
+      if (
+        yPos > 260
+      ) {
+
+        doc.addPage();
+
+        yPos = 20;
+
+      }
+
+      doc.setFont(
+        "helvetica",
+        "bold"
+      );
+
+      doc.text(
+        `${dataIndex + 1}. ${item.tanggal}`,
+        14,
+        yPos
+      );
+
+      yPos += 7;
+
+      doc.setFont(
+        "helvetica",
+        "normal"
+      );
+
+      const catatan =
+        item.keterangan
+          .split("\n")
+          .filter(
+            (line) =>
+              line.trim()
+          );
+
+      catatan.forEach(
+        (
+          line,
+          index
+        ) => {
+
+          const cleanText =
+            line.replace(
+              /^\d+\.\s*/,
+              ""
+            );
+
+          const wrappedText =
+            doc.splitTextToSize(
+              cleanText,
+              160
+            );
+
+          if (
+            yPos +
+              wrappedText.length *
+                7 >
+            280
+          ) {
+
+            doc.addPage();
+
+            yPos = 20;
+
+          }
+
+          doc.text(
+            `${index + 1}.`,
+            18,
+            yPos
+          );
+
+          doc.text(
+            wrappedText,
+            28,
+            yPos
+          );
+
+          yPos +=
+            wrappedText.length *
+            7;
+
+        }
+      );
+
+      yPos += 8;
+
+    }
+  );
+
+  window.open(
+    doc.output(
+      "bloburl"
+    ),
+    "_blank"
+  );
+
+  doc.save(
+    `laporan-bulanan-${bulanIni + 1}-${tahunIni}.pdf`
+  );
+
+};
 
   const exportExcel = () => {
 
