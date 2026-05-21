@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -84,6 +85,7 @@ export default function RekapTable({
       0
     );
 
+  // GRAND TOTAL TANPA MARKUP
   const grandTotal =
     subtotalBelanja +
     subtotalCashbon +
@@ -406,7 +408,7 @@ export default function RekapTable({
 
                   </p>
 
-                  {/* <button
+                  <button
                     onClick={() =>
                       onEditCatatan(
                         item
@@ -415,7 +417,7 @@ export default function RekapTable({
                     className="text-blue-600 text-sm font-semibold"
                   >
                     Edit
-                  </button> */}
+                  </button>
 
                 </div>
 
